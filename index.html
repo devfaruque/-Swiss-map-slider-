@@ -1,0 +1,494 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head><script src="https://static.readdy.ai/static/e.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swiss Cantons Explorer - Interactive Map Slider</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+    <style>
+        :where([class^="ri-"])::before { content: "\f3c2"; }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#dc2626',
+                        secondary: '#ffffff'
+                    },
+                    borderRadius: {
+                        'none': '0px',
+                        'sm': '4px',
+                        DEFAULT: '8px',
+                        'md': '12px',
+                        'lg': '16px',
+                        'xl': '20px',
+                        '2xl': '24px',
+                        '3xl': '32px',
+                        'full': '9999px',
+                        'button': '8px'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 font-sans">
+    <header class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <div class="text-2xl font-['Pacifico'] text-primary">SwissExplorer</div>
+                </div>
+                <nav class="hidden md:flex space-x-8">
+                    <a href="#" class="text-gray-700 hover:text-primary transition-colors">Home</a>
+                    <a href="#" class="text-gray-700 hover:text-primary transition-colors">Cantons</a>
+                    <a href="#" class="text-gray-700 hover:text-primary transition-colors">Culture</a>
+                    <a href="#" class="text-gray-700 hover:text-primary transition-colors">Tourism</a>
+                    <a href="#" class="text-gray-700 hover:text-primary transition-colors">About</a>
+                </nav>
+                <div class="md:hidden">
+                    <button class="text-gray-700 hover:text-primary">
+                        <div class="w-6 h-6 flex items-center justify-center">
+                            <i class="ri-menu-line text-xl"></i>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="relative h-screen bg-gradient-to-br from-blue-50 to-red-50 overflow-hidden">
+            <div class="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20" style="background-image: url('https://readdy.ai/api/search-image?query=Beautiful%20panoramic%20view%20of%20Swiss%20Alps%20mountains%20with%20pristine%20lakes%20and%20green%20valleys%20in%20soft%20morning%20light%20creating%20a%20serene%20and%20majestic%20landscape%20perfect%20for%20showcasing%20Switzerland%20natural%20beauty%20and%20tourism%20appeal&width=1920&height=1080&seq=swiss-bg-1&orientation=landscape')"></div>
+            
+            <div class="relative z-10 h-full flex flex-col">
+                <div class="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+                    <div class="max-w-7xl w-full">
+                        <div class="text-center mb-12">
+                            <h1 class="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
+                                Discover Switzerland
+                            </h1>
+                            <p class="text-xl md:text-2xl text-gray-700 max-w-3xl mx-auto">
+                                Explore the beauty and diversity of Swiss cantons through our interactive map experience
+                            </p>
+                        </div>
+
+                        <div class="relative bg-white rounded-2xl shadow-2xl p-6 md:p-8">
+                            <div class="swiss-map-slider relative">
+                                <div class="flex items-center justify-between mb-6">
+                                    <h2 class="text-2xl font-bold text-gray-900">Swiss Cantons Explorer</h2>
+                                    <div class="flex items-center space-x-4">
+                                        <button id="prevBtn" class="w-12 h-12 flex items-center justify-center bg-gray-100 hover:bg-primary hover:text-white rounded-full transition-all duration-300 !rounded-button">
+                                            <i class="ri-arrow-left-line text-lg"></i>
+                                        </button>
+                                        <button id="nextBtn" class="w-12 h-12 flex items-center justify-center bg-gray-100 hover:bg-primary hover:text-white rounded-full transition-all duration-300 !rounded-button">
+                                            <i class="ri-arrow-right-line text-lg"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="relative">
+                                    <div id="mapContainer" class="relative h-96 md:h-[500px] bg-gray-50 rounded-lg overflow-hidden">
+                                        <svg id="swissMap" viewBox="0 0 800 600" class="w-full h-full">
+                                            <defs>
+                                                <linearGradient id="activeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                                    <stop offset="0%" style="stop-color:#dc2626;stop-opacity:0.8" />
+                                                    <stop offset="100%" style="stop-color:#b91c1c;stop-opacity:1" />
+                                                </linearGradient>
+                                                <linearGradient id="inactiveGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                                    <stop offset="0%" style="stop-color:#e5e7eb;stop-opacity:0.8" />
+                                                    <stop offset="100%" style="stop-color:#d1d5db;stop-opacity:1" />
+                                                </linearGradient>
+                                            </defs>
+                                            
+                                            <g id="cantonZurich" class="canton" data-canton="zurich">
+                                                <path d="M450 150 L520 140 L530 180 L500 200 L470 190 Z" fill="url(#inactiveGradient)" stroke="#9ca3af" stroke-width="1"/>
+                                                <text x="490" y="175" text-anchor="middle" class="canton-label text-sm font-medium fill-gray-700">Zurich</text>
+                                            </g>
+                                            
+                                            <g id="cantonBern" class="canton" data-canton="bern">
+                                                <path d="M300 200 L400 190 L420 250 L380 280 L320 270 L280 240 Z" fill="url(#inactiveGradient)" stroke="#9ca3af" stroke-width="1"/>
+                                                <text x="350" y="235" text-anchor="middle" class="canton-label text-sm font-medium fill-gray-700">Bern</text>
+                                            </g>
+                                            
+                                            <g id="cantonGeneva" class="canton" data-canton="geneva">
+                                                <path d="M180 320 L220 310 L230 340 L210 360 L180 350 Z" fill="url(#inactiveGradient)" stroke="#9ca3af" stroke-width="1"/>
+                                                <text x="205" y="335" text-anchor="middle" class="canton-label text-sm font-medium fill-gray-700">Geneva</text>
+                                            </g>
+                                            
+                                            <g id="cantonValais" class="canton" data-canton="valais">
+                                                <path d="M250 350 L350 340 L370 380 L340 420 L280 410 L240 380 Z" fill="url(#inactiveGradient)" stroke="#9ca3af" stroke-width="1"/>
+                                                <text x="305" y="380" text-anchor="middle" class="canton-label text-sm font-medium fill-gray-700">Valais</text>
+                                            </g>
+                                            
+                                            <g id="cantonTicino" class="canton" data-canton="ticino">
+                                                <path d="M480 380 L540 370 L560 420 L520 450 L480 440 L460 400 Z" fill="url(#inactiveGradient)" stroke="#9ca3af" stroke-width="1"/>
+                                                <text x="510" y="410" text-anchor="middle" class="canton-label text-sm font-medium fill-gray-700">Ticino</text>
+                                            </g>
+                                            
+                                            <g id="cantonGrisons" class="canton" data-canton="grisons">
+                                                <path d="M550 250 L620 240 L640 300 L600 340 L560 330 L540 280 Z" fill="url(#inactiveGradient)" stroke="#9ca3af" stroke-width="1"/>
+                                                <text x="590" y="290" text-anchor="middle" class="canton-label text-sm font-medium fill-gray-700">Grisons</text>
+                                            </g>
+                                        </svg>
+
+                                        <div id="cantonInfo" class="absolute top-4 right-4 bg-white rounded-lg shadow-lg p-4 max-w-xs opacity-0 transform translate-y-2 transition-all duration-300">
+                                            <h3 id="cantonName" class="text-lg font-bold text-gray-900 mb-2"></h3>
+                                            <p id="cantonDescription" class="text-sm text-gray-600 mb-3"></p>
+                                            <div class="space-y-1">
+                                                <div class="flex justify-between text-xs">
+                                                    <span class="text-gray-500">Population:</span>
+                                                    <span id="cantonPopulation" class="font-medium"></span>
+                                                </div>
+                                                <div class="flex justify-between text-xs">
+                                                    <span class="text-gray-500">Area:</span>
+                                                    <span id="cantonArea" class="font-medium"></span>
+                                                </div>
+                                                <div class="flex justify-between text-xs">
+                                                    <span class="text-gray-500">Capital:</span>
+                                                    <span id="cantonCapital" class="font-medium"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex justify-center mt-6">
+                                        <div id="pagination" class="flex space-x-2">
+                                            <button class="pagination-dot w-3 h-3 rounded-full bg-primary transition-all duration-300" data-slide="0"></button>
+                                            <button class="pagination-dot w-3 h-3 rounded-full bg-gray-300 hover:bg-gray-400 transition-all duration-300" data-slide="1"></button>
+                                            <button class="pagination-dot w-3 h-3 rounded-full bg-gray-300 hover:bg-gray-400 transition-all duration-300" data-slide="2"></button>
+                                            <button class="pagination-dot w-3 h-3 rounded-full bg-gray-300 hover:bg-gray-400 transition-all duration-300" data-slide="3"></button>
+                                            <button class="pagination-dot w-3 h-3 rounded-full bg-gray-300 hover:bg-gray-400 transition-all duration-300" data-slide="4"></button>
+                                            <button class="pagination-dot w-3 h-3 rounded-full bg-gray-300 hover:bg-gray-400 transition-all duration-300" data-slide="5"></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-20 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                        Why Explore Swiss Cantons?
+                    </h2>
+                    <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+                        Each canton offers unique landscapes, cultures, and experiences that make Switzerland one of the world's most diverse countries
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="ri-mountain-line text-2xl text-primary"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Alpine Beauty</h3>
+                        <p class="text-gray-600">From the Matterhorn to Jungfrau, discover breathtaking mountain landscapes across different cantons</p>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="ri-building-line text-2xl text-primary"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Rich Culture</h3>
+                        <p class="text-gray-600">Experience diverse traditions, languages, and customs that vary beautifully from canton to canton</p>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="ri-map-pin-line text-2xl text-primary"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Hidden Gems</h3>
+                        <p class="text-gray-600">Uncover lesser-known attractions and local secrets in each canton's unique territory</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-20 bg-gray-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid lg:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+                            Interactive Canton Discovery
+                        </h2>
+                        <p class="text-lg text-gray-600 mb-8">
+                            Our interactive map slider allows you to explore each Swiss canton in detail. Hover over regions to learn about their unique characteristics, from population and geography to cultural highlights and economic significance.
+                        </p>
+                        <div class="space-y-4">
+                            <div class="flex items-start space-x-3">
+                                <div class="w-6 h-6 bg-primary rounded-full flex items-center justify-center mt-1">
+                                    <i class="ri-check-line text-white text-sm"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-900">Detailed Information</h4>
+                                    <p class="text-gray-600">Get comprehensive data about each canton's demographics, geography, and key features</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-3">
+                                <div class="w-6 h-6 bg-primary rounded-full flex items-center justify-center mt-1">
+                                    <i class="ri-check-line text-white text-sm"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-900">Visual Exploration</h4>
+                                    <p class="text-gray-600">Navigate through cantons with smooth animations and intuitive controls</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-3">
+                                <div class="w-6 h-6 bg-primary rounded-full flex items-center justify-center mt-1">
+                                    <i class="ri-check-line text-white text-sm"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-900">Mobile Friendly</h4>
+                                    <p class="text-gray-600">Fully responsive design works perfectly on all devices and screen sizes</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <img src="https://readdy.ai/api/search-image?query=Modern%20tablet%20device%20displaying%20an%20interactive%20map%20interface%20with%20clean%20design%20elements%20and%20colorful%20geographic%20regions%20on%20a%20minimalist%20white%20background%20showcasing%20digital%20mapping%20technology%20and%20user%20interface%20design&width=600&height=400&seq=tablet-map-1&orientation=landscape" alt="Interactive Map Interface" class="rounded-lg shadow-xl object-cover w-full h-80">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-lg"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <div class="text-2xl font-['Pacifico'] text-primary mb-4">SwissExplorer</div>
+                    <p class="text-gray-400">Discover the beauty and diversity of Switzerland through our interactive canton explorer.</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Explore</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors">All Cantons</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Popular Destinations</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Cultural Sites</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Natural Wonders</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Resources</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors">Travel Guide</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Map Legend</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Statistics</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">FAQ</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Connect</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors">Contact Us</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Newsletter</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Social Media</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Support</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2025 SwissExplorer. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script id="mapSlider">
+        document.addEventListener('DOMContentLoaded', function() {
+            const cantons = [
+                {
+                    id: 'zurich',
+                    name: 'Zurich',
+                    description: 'Switzerland\'s economic powerhouse and largest city, known for its vibrant cultural scene and financial district.',
+                    population: '1.5M',
+                    area: '1,729 km²',
+                    capital: 'Zurich'
+                },
+                {
+                    id: 'bern',
+                    name: 'Bern',
+                    description: 'The federal capital of Switzerland, featuring medieval architecture and UNESCO World Heritage sites.',
+                    population: '1.0M',
+                    area: '5,959 km²',
+                    capital: 'Bern'
+                },
+                {
+                    id: 'geneva',
+                    name: 'Geneva',
+                    description: 'International hub hosting numerous global organizations including the UN and Red Cross.',
+                    population: '500K',
+                    area: '282 km²',
+                    capital: 'Geneva'
+                },
+                {
+                    id: 'valais',
+                    name: 'Valais',
+                    description: 'Home to the Matterhorn and extensive wine regions in the Rhône valley.',
+                    population: '350K',
+                    area: '5,224 km²',
+                    capital: 'Sion'
+                },
+                {
+                    id: 'ticino',
+                    name: 'Ticino',
+                    description: 'Italian-speaking canton known for its Mediterranean climate and stunning lakes.',
+                    population: '350K',
+                    area: '2,812 km²',
+                    capital: 'Bellinzona'
+                },
+                {
+                    id: 'grisons',
+                    name: 'Grisons',
+                    description: 'Switzerland\'s largest canton, famous for its pristine Alpine landscapes and winter sports.',
+                    population: '200K',
+                    area: '7,105 km²',
+                    capital: 'Chur'
+                }
+            ];
+
+            let currentSlide = 0;
+            const cantonElements = document.querySelectorAll('.canton');
+            const cantonInfo = document.getElementById('cantonInfo');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const paginationDots = document.querySelectorAll('.pagination-dot');
+
+            function updateCantonDisplay(index) {
+                const canton = cantons[index];
+                
+                cantonElements.forEach((el, i) => {
+                    const path = el.querySelector('path');
+                    if (i === index) {
+                        path.setAttribute('fill', 'url(#activeGradient)');
+                        el.style.transform = 'scale(1.05)';
+                        el.style.transformOrigin = 'center';
+                    } else {
+                        path.setAttribute('fill', 'url(#inactiveGradient)');
+                        el.style.transform = 'scale(1)';
+                    }
+                });
+
+                document.getElementById('cantonName').textContent = canton.name;
+                document.getElementById('cantonDescription').textContent = canton.description;
+                document.getElementById('cantonPopulation').textContent = canton.population;
+                document.getElementById('cantonArea').textContent = canton.area;
+                document.getElementById('cantonCapital').textContent = canton.capital;
+
+                cantonInfo.style.opacity = '1';
+                cantonInfo.style.transform = 'translateY(0)';
+
+                paginationDots.forEach((dot, i) => {
+                    if (i === index) {
+                        dot.classList.remove('bg-gray-300');
+                        dot.classList.add('bg-primary');
+                    } else {
+                        dot.classList.remove('bg-primary');
+                        dot.classList.add('bg-gray-300');
+                    }
+                });
+            }
+
+            function nextSlide() {
+                currentSlide = (currentSlide + 1) % cantons.length;
+                updateCantonDisplay(currentSlide);
+            }
+
+            function prevSlide() {
+                currentSlide = (currentSlide - 1 + cantons.length) % cantons.length;
+                updateCantonDisplay(currentSlide);
+            }
+
+            nextBtn.addEventListener('click', nextSlide);
+            prevBtn.addEventListener('click', prevSlide);
+
+            paginationDots.forEach((dot, index) => {
+                dot.addEventListener('click', () => {
+                    currentSlide = index;
+                    updateCantonDisplay(currentSlide);
+                });
+            });
+
+            cantonElements.forEach((canton, index) => {
+                canton.addEventListener('mouseenter', () => {
+                    if (currentSlide !== index) {
+                        currentSlide = index;
+                        updateCantonDisplay(currentSlide);
+                    }
+                });
+            });
+
+            updateCantonDisplay(0);
+
+            setInterval(nextSlide, 5000);
+        });
+    </script>
+
+    <script id="mobileMenu">
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuBtn = document.querySelector('.md\\:hidden button');
+            const nav = document.querySelector('nav');
+            
+            if (mobileMenuBtn && nav) {
+                mobileMenuBtn.addEventListener('click', function() {
+                    nav.classList.toggle('hidden');
+                    nav.classList.toggle('absolute');
+                    nav.classList.toggle('top-16');
+                    nav.classList.toggle('left-0');
+                    nav.classList.toggle('right-0');
+                    nav.classList.toggle('bg-white');
+                    nav.classList.toggle('shadow-lg');
+                    nav.classList.toggle('p-4');
+                    nav.classList.toggle('flex-col');
+                    nav.classList.toggle('space-y-4');
+                });
+            }
+        });
+    </script>
+
+    <script id="smoothScrolling">
+        document.addEventListener('DOMContentLoaded', function() {
+            const links = document.querySelectorAll('a[href^="#"]');
+            
+            links.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+<script>
+    !function (t, e) { var o, n, p, r; e.__SV || (window.posthog = e, e._i = [], e.init = function (i, s, a) { function g(t, e) { var o = e.split("."); 2 == o.length && (t = t[o[0]], e = o[1]), t[e] = function () { t.push([e].concat(Array.prototype.slice.call(arguments, 0))) } } (p = t.createElement("script")).type = "text/javascript", p.crossOrigin = "anonymous", p.async = !0, p.src = s.api_host.replace(".i.posthog.com", "-assets.i.posthog.com") + "/static/array.js", (r = t.getElementsByTagName("script")[0]).parentNode.insertBefore(p, r); var u = e; for (void 0 !== a ? u = e[a] = [] : a = "posthog", u.people = u.people || [], u.toString = function (t) { var e = "posthog"; return "posthog" !== a && (e += "." + a), t || (e += " (stub)"), e }, u.people.toString = function () { return u.toString(1) + ".people (stub)" }, o = "init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty createPersonProfile opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug".split(" "), n = 0; n < o.length; n++)g(u, o[n]); e._i.push([i, s, a]) }, e.__SV = 1) }(document, window.posthog || []);
+    posthog.init('phc_t9tkQZJiyi2ps9zUYm8TDsL6qXo4YmZx0Ot5rBlAlEd', {
+        api_host: 'https://us.i.posthog.com',
+        autocapture: false,
+        capture_pageview: false,
+        capture_pageleave: false,
+        capture_performance: {
+            web_vitals: false,
+        },
+        rageclick: false,
+    })
+    window.shareKey = 'zYAlI2fY9hZXNH4D2qDjAQ';
+    window.host = 'readdy.ai';
+</script>
+</body>
+</html>
